@@ -1,7 +1,10 @@
 export default abstract class Serializable {
-  static from(json: Record<string, unknown>): void {
+  from(json: Record<string, unknown>): void {
     Object.keys(json).forEach((key) => {
-      this[key] = json[key];
+      try {
+        this[key] = json[key];
+        // eslint-disable-next-line no-empty
+      } catch (err) {}
     });
   }
 }

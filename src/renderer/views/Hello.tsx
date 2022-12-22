@@ -1,9 +1,12 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import GastoDiario from 'renderer/classes/db/gastoDiario';
 import icon from '../../../assets/icon.svg';
-import '../styles/App.css';
+import '../styles/Hello.css';
+import Table from './Table';
 
 const Hello = () => {
+  const [gastos, setGastos] = useState<GastoDiario[]>();
+
   const insertGastosDiarios =
     'INSERT INTO gastosDiarios (data,mes,ano,valor,tag,descricao,saida,valor_calculado) values (@data,@mes,@ano,@valor,@tag,@descricao,@saida,@valor_calculado)';
 
@@ -11,9 +14,11 @@ const Hello = () => {
     window.electron.ipcRenderer
       .dbGet('SELECT * FROM gastosDiarios')
       .then((data: any[]) => {
-        data.forEach((item: Record<string, unknown>) => {
-          console.log(GastoDiario.from(item));
-        });
+        const diarios = data.map((item: Record<string, unknown>) =>
+          GastoDiario.map(item)
+        );
+
+        setGastos(diarios);
 
         return data;
       })
@@ -47,35 +52,28 @@ const Hello = () => {
 
   return (
     <div>
-      <div className="Hello">
+      {/* <div className="Hello">
         <img width="200px" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
+      </div> */}
+      <h1>Financeiro</h1>
       <div className="Hello">
         <button type="button" onClick={testeGet}>
           <span role="img" aria-label="books">
             📚
           </span>
-          Read our docs
+          Obter todos
         </button>
 
         <button type="button" onClick={testeInsert}>
           <span role="img" aria-label="books">
             🙏
           </span>
-          Donate
+          Inserir 2
         </button>
       </div>
+      <Table id="gastos" data={gastos} />
     </div>
   );
 };
 
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
-  );
-}
+export default Hello;
