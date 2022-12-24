@@ -1,0 +1,39 @@
+import { InputHTMLAttributes, useState, useEffect } from 'react';
+
+// A debounced input react component
+const DebouncedInput = ({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  // eslint-disable-next-line react/require-default-props
+  debounce?: number;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'>) => {
+  const [value, setValue] = useState(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange(value);
+    }, debounce);
+
+    return () => clearTimeout(timeout);
+  }, [debounce, onChange, value]);
+
+  return (
+    <input
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+};
+
+export default DebouncedInput;

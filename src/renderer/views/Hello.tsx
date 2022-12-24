@@ -1,77 +1,113 @@
 import { useState } from 'react';
-import GastoDiario from 'renderer/classes/db/gastoDiario';
-import icon from '../../../assets/icon.svg';
+import Valor from 'renderer/classes/db/Valor';
+import salario from 'renderer/classes/forms/formSalario';
 import '../styles/Hello.css';
-import Table from './Table';
+
+import { faker } from '@faker-js/faker';
+import Tipo from 'renderer/classes/Tipo';
+import DespesaFixa from 'renderer/classes/db/DespesaFixa';
+import GastoGenerico from 'renderer/classes/db/GastoGenerico';
+import Salario from 'renderer/classes/db/Salario';
+import GenericTable from './GenericTable';
+import Form from './Form';
 
 const Hello = () => {
-  const [gastos, setGastos] = useState<GastoDiario[]>();
+  const [valores, setValores] = useState<Valor[]>();
 
-  const insertGastosDiarios =
-    'INSERT INTO gastosDiarios (data,mes,ano,valor,tag,descricao,saida,valor_calculado) values (@data,@mes,@ano,@valor,@tag,@descricao,@saida,@valor_calculado)';
+  const insertValores =
+    'INSERT INTO valores (ano,mes,tipo,valor,tag,descricao) values (@ano,@mes,@tipo,@valor,@tag,@descricao)';
+  const insertGastoDiario =
+    'INSERT INTO valores (ano,mes,tipo,valor,tag,descricao,dia) values (@ano,@mes,@tipo,@valor,@tag,@descricao,@dia)';
 
   const testeGet = () => {
     window.electron.ipcRenderer
-      .dbGet('SELECT * FROM gastosDiarios')
-      .then((data: any[]) => {
-        const diarios = data.map((item: Record<string, unknown>) =>
-          GastoDiario.map(item)
-        );
-
-        setGastos(diarios);
-
-        return data;
+      .dbGet('SELECT * FROM valores')
+      .then((data: Record<string, unknown>[]) => {
+        const diarios = data.map((item) => Valor.map(item));
+        setValores(diarios);
+        return null;
       })
       .catch((err) => console.error(err));
   };
 
-  const testeInsert = () => {
-    const gasto1 = new GastoDiario(
-      new Date(),
-      100,
-      'teste',
-      'teste gasto 100',
-      true
+  const geraGenerico = (): Valor | Salario | DespesaFixa | GastoGenerico => {
+    const data = faker.date.between(
+      new Date(2020, 0, 1),
+      new Date(2022, 11, 31)
     );
-    const gasto2 = new GastoDiario(
-      new Date(),
-      50,
-      'teste',
-      'teste achei 50',
-      false
-    );
+    const ano = data.getFullYear();
+    const mes = data.getMonth() + 1;
+    const tipo: Tipo = faker.datatype.number({ min: 1, max: 4 });
+    const tag = faker.helpers.shuffle([
+      'comida',
+      'ifood',
+      'twitch',
+      'jogos',
+      'beleza',
+    ])[0];
+    const descricao = faker.helpers.shuffle([
+      'queijo',
+      'pizza',
+      'hidratante',
+      'shampoo',
+      'sub no streamer AZUL',
+      'sub no streamer VERMELHO',
+      'sub no streamer VERDE',
+      'sub no streamer ROXO',
+      'ovo',
+    ])[0];
+    const valor = faker.datatype.number({ min: 1, max: 4999, precision: 0.01 });
 
-    window.electron.ipcRenderer
-      .dbInsert(insertGastosDiarios, gasto1, gasto2)
-      .then((data) => {
-        console.log('result from insert', data);
-        return data;
-      })
-      .catch((err) => console.error(err));
+    switch (tipo) {
+      case Tipo.DESPESA_FIXA:
+        return new DespesaFixa(ano, mes, tag, descricao, valor * -1);
+      case Tipo.GENERICO:
+        return new GastoGenerico(data, tag, descricao, valor * -1);
+      case Tipo.SALARIO:
+        return new Salario(ano, mes, tag, descricao, valor);
+      default:
+        return new Valor(ano, mes, tipo, tag, descricao, valor);
+    }
+  };
+
+  function clean(original: object): object {
+    const obj = Object.assign(original);
+    const keys = Object.keys(original).filter((key) => !key.startsWith('_'));
+    return JSON.parse(JSON.stringify(obj, keys));
+  }
+
+  const testeInsert = () => {
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < 1; i++) {
+      const gasto = geraGenerico();
+      const query =
+        gasto instanceof GastoGenerico ? insertGastoDiario : insertValores;
+
+      window.electron.ipcRenderer
+        .dbInsertOne(query, clean(gasto))
+        .catch((err) => console.error(err));
+    }
   };
 
   return (
     <div>
-      {/* <div className="Hello">
-        <img width="200px" alt="icon" src={icon} />
-      </div> */}
       <h1>Financeiro</h1>
+
+      <Form data={salario} />
+      <br />
+      <br />
+      <br />
       <div className="Hello">
         <button type="button" onClick={testeGet}>
-          <span role="img" aria-label="books">
-            📚
-          </span>
           Obter todos
         </button>
 
         <button type="button" onClick={testeInsert}>
-          <span role="img" aria-label="books">
-            🙏
-          </span>
-          Inserir 2
+          Inserir 1
         </button>
       </div>
-      <Table id="gastos" data={gastos} />
+
+      <GenericTable<Valor> data={valores ?? []} />
     </div>
   );
 };

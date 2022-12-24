@@ -27,11 +27,11 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
+// ipcMain.on('ipc-example', async (event, arg) => {
+//   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+//   console.log(msgTemplate(arg));
+//   event.reply('ipc-example', msgTemplate('pong'));
+// });
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -142,14 +142,17 @@ app
   .catch(console.log);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-ipcMain.handle('db-insert', (_event, query: string, ...params: any[]) => {
-  database.dbInsert(db, query, ...params);
-  return true;
+ipcMain.handle('db-insert-many', (_event, query: string, ...params: any[]) => {
+  return database.dbInsert(db, query, ...params);
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ipcMain.handle('db-insert-one', (_event, query: string, object: unknown) => {
+  return database.dbInsert(db, query, object)[0];
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ipcMain.handle('db-get', (_event, query: string, ...params: any[]) => {
   const result = database.dbAll(db, query, ...params);
-  console.log('result main', result);
   return result;
 });

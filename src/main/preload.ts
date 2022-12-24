@@ -1,16 +1,24 @@
+import { RunResult } from 'better-sqlite3';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'db-get' | 'db-insert';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dbGet(query: string, ...params: any[]) {
       return ipcRenderer.invoke('db-get', query, ...params);
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dbInsert(query: string, ...params: any[]) {
-      return ipcRenderer.invoke('db-insert', query, ...params);
+      return ipcRenderer.invoke('db-insert-many', query, ...params);
+    },
+    dbInsertOne(query: string, object: any) {
+      console.debug(query, object);
+      try {
+        return ipcRenderer.invoke('db-insert-one', query, object);
+      } catch (err) {
+        console.error(err);
+        return Promise.resolve(true);
+      }
     },
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);

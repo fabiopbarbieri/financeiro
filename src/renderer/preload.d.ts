@@ -1,3 +1,4 @@
+import { RunResult } from 'better-sqlite3';
 import { Channels } from 'main/preload';
 
 declare global {
@@ -10,10 +11,10 @@ declare global {
           func: (...args: unknown[]) => void
         ): (() => void) | undefined;
         once(channel: string, func: (...args: unknown[]) => void): void;
+        dbInsertMany(query: string, ...params: unknown[]): Promise<RunResult[]>;
+        dbInsertOne(query: string, object: unknown): Promise<RunResult>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dbInsert(query: string, ...params: any[]): Promise<any>;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dbGet(query: string, ...params: any[]): Promise<any>;
+        dbGet(query: string, ...params: unknown[]): Promise<any>;
       };
     };
   }

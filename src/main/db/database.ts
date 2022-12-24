@@ -2,9 +2,7 @@ import DatabaseConstructor, { Database, RunResult } from 'better-sqlite3';
 import path from 'path';
 
 import webpackPaths from '../../../.erb/configs/webpack.paths';
-import gastosDiarios from './tables/gastosDiarios';
-import gastosFixos from './tables/gastosFixos';
-import salarios from './tables/salarios';
+import { valores } from './tables/valores';
 
 const configureDB = (isDebug: boolean): Database => {
   // Read run-time assets
@@ -25,29 +23,34 @@ const configureDB = (isDebug: boolean): Database => {
   });
 
   // Tabelas
-  db.prepare(gastosDiarios).run();
-  db.prepare(salarios).run();
-  db.prepare(gastosFixos).run();
+  db.prepare(valores).run();
+  // db.prepare(index1).run();
+  // db.prepare(index2).run();
+  // db.prepare(index3).run();
 
   return db;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dbInsert = (db: Database, query: string, ...params: any[]): void => {
+const dbInsert = (
+  db: Database,
+  query: string,
+  ...params: unknown[]
+): RunResult[] => {
   const statement = db.prepare(query);
+  const result: RunResult[] = [];
 
-  const insertMany = db.transaction((table: unknown[]) => {
-    console.log('table insert');
-    console.log(table);
-    table.forEach((row) => statement.run(row));
-  });
+  db.transaction((table: unknown[]) => {
+    table.forEach((row) => {
+      result.push(statement.run(row));
+    });
+  })(params);
 
-  insertMany(params);
+  return result;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dbAll = (db: Database, query: string, ...params: any[]): any[] => {
   const statement = db.prepare(query);
-  console.log(params);
   if (params === undefined || params === null || params.length === 0) {
     return statement.all();
   }
