@@ -3,28 +3,33 @@ import Select from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import TypeForm from 'renderer/classes/forms/Form';
 import Input from 'renderer/classes/forms/Input';
-import '../styles/Hello.css';
+import '../styles/Main.css';
 
 import { ActionMeta, SingleValue } from 'react-select/dist/declarations/src';
 import { Option } from 'renderer/classes/forms/Option';
 import { useMap } from 'usehooks-ts';
+import { faker } from '@faker-js/faker';
+import { insertGenericos, insertValores } from 'renderer/classes/db/queries';
 
 const Form = ({ data }: { data: TypeForm }) => {
   const [inputs, setInputs] = useState<JSX.Element[]>();
 
   const [map, actions] = useMap<string, string>();
 
-  function generateInputs(array: Input[]) {
+  function generateInputs(array: Input[], rand: number) {
     return array?.map((input) => {
       let generatedInput = (
         <input
           id={`input-${input.name}`}
-          key={`input-${input.name}`}
+          key={`input-${input.name}-${rand}`}
           name={input.name}
           readOnly={input.readOnly}
           disabled={input.disabled}
           type={input.type}
           defaultValue={input.value}
+          step={input.step}
+          min={input.min}
+          max={input.max}
         />
       );
 
@@ -45,11 +50,10 @@ const Form = ({ data }: { data: TypeForm }) => {
         };
 
         if (input.select?.type === 'async') {
-          //actions.remove(input.name);
           generatedInput = (
             <AsyncCreatableSelect
               id={`input-${input.name}`}
-              key={`input-${input.name}`}
+              key={`input-${input.name}-${rand}`}
               name={input.name}
               options={input.select.options}
               loadOptions={input.select.loadFn}
@@ -76,7 +80,7 @@ const Form = ({ data }: { data: TypeForm }) => {
           generatedInput = (
             <Select
               id={`input-${input.name}`}
-              key={`input-${input.name}`}
+              key={`input-${input.name}-${rand}`}
               defaultValue={
                 input.select?.defaultValue
                   ? input.select?.options?.find((_, index) => index === 1)
@@ -94,7 +98,7 @@ const Form = ({ data }: { data: TypeForm }) => {
         <div
           key={`div-${input.name}`}
           style={{
-            display: 'flex',
+            display: input?.hidden ? 'none' : 'flex',
             flexDirection: 'column',
             maxWidth: '200px',
             width: input.width,
@@ -108,22 +112,25 @@ const Form = ({ data }: { data: TypeForm }) => {
     });
   }
 
-  function refresh() {
-    setInputs(generateInputs(data.inputs));
+  function refresh(rand: number) {
+    setInputs(generateInputs(data?.inputs, rand));
   }
 
   useEffect(() => {
-    refresh();
+    actions.reset();
+    refresh(faker.datatype.number(10000));
   }, [data]);
 
   useEffect(() => {
-    refresh();
+    actions.reset();
+    refresh(faker.datatype.number(10000));
   }, []);
 
   function defaultFormat(input: Input, value: string) {
     let anyValue: unknown = value;
     if (input.type === 'number') {
       if (value === '') anyValue = 0;
+      anyValue = Number(anyValue);
     }
     return { [input.name]: anyValue };
   }
@@ -149,15 +156,22 @@ const Form = ({ data }: { data: TypeForm }) => {
 
       arr.push(inp.formatFn ? inp.formatFn(value) : defaultFormat(inp, value));
     });
-    const object = Object.assign({}, ...arr);
-    console.log(object);
+    return Object.assign({}, ...arr);
+  };
+
+  const inserir = () => {
+    const valor = getValores();
+
+    window.electron.ipcRenderer
+      .dbInsertOne(valor?.dia ? insertGenericos : insertValores, valor)
+      .catch((err) => console.error(err));
   };
 
   return (
     <div>
       <div style={{ display: 'flex' }}>{inputs}</div>
-      <button id="get-valores" type="button" onClick={getValores}>
-        Pegar Valores
+      <button id="get-valores" type="button" onClick={inserir}>
+        Inserir
       </button>
     </div>
   );

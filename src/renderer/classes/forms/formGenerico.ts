@@ -2,7 +2,7 @@ import { queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
 
-const salario: Form = {
+const generico: Form = {
   inputs: [
     {
       name: 'id',
@@ -14,14 +14,17 @@ const salario: Form = {
     },
     {
       name: 'data',
-      label: 'Mês / Ano',
-      type: 'month',
+      label: 'Data',
+      type: 'date',
       width: '200px',
-      value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
+      value: `${new Date().getFullYear()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getDate()}`,
       formatFn: (value: string) => {
         return {
           ano: Number(value.substring(0, 4)),
-          mes: Number(value.substring(5)),
+          mes: Number(value.substring(5, 7)),
+          dia: Number(value.substring(8)),
         };
       },
     },
@@ -43,12 +46,21 @@ const salario: Form = {
       width: '250px',
     },
     { name: 'descricao', label: 'Descrição', type: 'text', width: '400px' },
-    { name: 'valor', label: 'Valor', type: 'number', min: 0, step: '0.01' },
+    {
+      name: 'valor',
+      label: 'Valor',
+      type: 'number',
+      min: 0,
+      step: '0.01',
+      formatFn: (value: string) => {
+        return { valor: Math.abs(Number(value)) * -1 };
+      },
+    },
     {
       name: 'tipo',
       label: 'Tipo',
-      type: 'text',
-      value: Tipo.SALARIO,
+      type: 'number',
+      value: Tipo.GENERICO,
       hidden: true,
       readOnly: true,
       disabled: true,
@@ -56,4 +68,4 @@ const salario: Form = {
   ],
 };
 
-export default salario;
+export default generico;

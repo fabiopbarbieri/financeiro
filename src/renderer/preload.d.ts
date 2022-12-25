@@ -13,8 +13,10 @@ declare global {
         once(channel: string, func: (...args: unknown[]) => void): void;
         dbInsertMany(query: string, ...params: unknown[]): Promise<RunResult[]>;
         dbInsertOne(query: string, object: unknown): Promise<RunResult>;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dbGet(query: string, ...params: unknown[]): Promise<any>;
+        dbGet(
+          query: string,
+          ...params: unknown[]
+        ): Promise<Record<string, unknown>[]>;
       };
     };
   }

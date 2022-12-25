@@ -2,7 +2,7 @@ import DatabaseConstructor, { Database, RunResult } from 'better-sqlite3';
 import path from 'path';
 
 import webpackPaths from '../../../.erb/configs/webpack.paths';
-import { valores } from './tables/valores';
+import { index1, index2, index3, valores } from './tables/valores';
 
 const configureDB = (isDebug: boolean): Database => {
   // Read run-time assets
@@ -24,9 +24,9 @@ const configureDB = (isDebug: boolean): Database => {
 
   // Tabelas
   db.prepare(valores).run();
-  // db.prepare(index1).run();
-  // db.prepare(index2).run();
-  // db.prepare(index3).run();
+  db.prepare(index1).run();
+  db.prepare(index2).run();
+  db.prepare(index3).run();
 
   return db;
 };
@@ -49,7 +49,11 @@ const dbInsert = (
   return result;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dbAll = (db: Database, query: string, ...params: any[]): any[] => {
+const dbAll = (
+  db: Database,
+  query: string,
+  ...params: Record<string, unknown>[]
+): Record<string, unknown>[] => {
   const statement = db.prepare(query);
   if (params === undefined || params === null || params.length === 0) {
     return statement.all();

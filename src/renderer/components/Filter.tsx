@@ -1,9 +1,9 @@
 import { Column, Table } from '@tanstack/react-table';
 import { useMemo } from 'react';
-import ItemFinanceiro from 'renderer/classes/db/ItemFinanceiro';
+import Valor from 'renderer/classes/db/Valor';
 import DebouncedInput from './DebouncedInput';
 
-function Filter<T extends ItemFinanceiro>({
+function Filter<T extends Valor>({
   column,
   table,
 }: {

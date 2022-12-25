@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 
 import Valor from 'renderer/classes/db/Valor';
 import Filter from './Filter';
-import proper from './helpers/properCase';
+import proper from '../helpers/properCase';
 
 import '../styles/GenericTable.css';
 

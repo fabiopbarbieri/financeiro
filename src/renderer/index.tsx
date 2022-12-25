@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
-import Hello from './views/Hello';
+import Main from './views/Main';
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const container = document.getElementById('root')!;
@@ -8,7 +8,7 @@ const root = createRoot(container);
 root.render(
   <Router>
     <Routes>
-      <Route path="/" element={<Hello />} />
+      <Route path="/" element={<Main />} />
     </Routes>
   </Router>
 );

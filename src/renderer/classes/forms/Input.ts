@@ -40,6 +40,7 @@ type Input = {
   };
 
   formatFn?: (value: string) => unknown;
+  hidden?: boolean;
 };
 
 export default Input;

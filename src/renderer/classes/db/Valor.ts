@@ -1,5 +1,5 @@
 import { RankingInfo } from '@tanstack/match-sorter-utils';
-import translateMonth from 'renderer/views/helpers/translateMonth';
+import translateMonth from 'renderer/helpers/translateMonth';
 import Serializable from '../Serializable';
 import TableProperties from '../TableProperties';
 import Tipo from '../Tipo';

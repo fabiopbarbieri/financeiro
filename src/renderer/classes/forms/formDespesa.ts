@@ -2,7 +2,7 @@ import { queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
 
-const salario: Form = {
+const despesaFixa: Form = {
   inputs: [
     {
       name: 'id',
@@ -48,7 +48,7 @@ const salario: Form = {
       name: 'tipo',
       label: 'Tipo',
       type: 'text',
-      value: Tipo.SALARIO,
+      value: Tipo.DESPESA_FIXA,
       hidden: true,
       readOnly: true,
       disabled: true,
@@ -56,4 +56,4 @@ const salario: Form = {
   ],
 };
 
-export default salario;
+export default despesaFixa;

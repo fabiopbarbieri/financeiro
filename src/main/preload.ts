@@ -1,4 +1,3 @@
-import { RunResult } from 'better-sqlite3';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'db-get' | 'db-insert';
@@ -12,13 +11,7 @@ contextBridge.exposeInMainWorld('electron', {
       return ipcRenderer.invoke('db-insert-many', query, ...params);
     },
     dbInsertOne(query: string, object: any) {
-      console.debug(query, object);
-      try {
-        return ipcRenderer.invoke('db-insert-one', query, object);
-      } catch (err) {
-        console.error(err);
-        return Promise.resolve(true);
-      }
+      return ipcRenderer.invoke('db-insert-one', query, object);
     },
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);
