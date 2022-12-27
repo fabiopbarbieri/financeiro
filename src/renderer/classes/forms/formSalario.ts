@@ -1,8 +1,9 @@
-import { queryTagSelect } from '../db/queries';
+import { insertValores, queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
 
 const salario: Form = {
+  insert: insertValores,
   inputs: [
     {
       name: 'id',
@@ -11,6 +12,7 @@ const salario: Form = {
       readOnly: true,
       disabled: true,
       width: '50px',
+      hidden: true,
     },
     {
       name: 'data',
@@ -18,10 +20,10 @@ const salario: Form = {
       type: 'month',
       width: '200px',
       value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
-      formatFn: (value: string) => {
+      formatFn: (value: string | string[]) => {
         return {
-          ano: Number(value.substring(0, 4)),
-          mes: Number(value.substring(5)),
+          ano: Number(String(value).substring(0, 4)),
+          mes: Number(String(value).substring(5)),
         };
       },
     },
@@ -41,9 +43,23 @@ const salario: Form = {
             }),
       },
       width: '250px',
+      clearAfterInsert: true,
     },
-    { name: 'descricao', label: 'Descrição', type: 'text', width: '400px' },
-    { name: 'valor', label: 'Valor', type: 'number', min: 0, step: '0.01' },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      type: 'text',
+      width: '400px',
+      clearAfterInsert: true,
+    },
+    {
+      name: 'valor',
+      label: 'Valor',
+      type: 'number',
+      min: 0,
+      step: '0.01',
+      clearAfterInsert: true,
+    },
     {
       name: 'tipo',
       label: 'Tipo',

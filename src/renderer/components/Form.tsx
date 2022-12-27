@@ -1,23 +1,40 @@
-import { useEffect, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import TypeForm from 'renderer/classes/forms/Form';
 import Input from 'renderer/classes/forms/Input';
 import '../styles/Main.css';
 
-import { ActionMeta, SingleValue } from 'react-select/dist/declarations/src';
+import { faker } from '@faker-js/faker';
+import {
+  ActionMeta,
+  MultiValue,
+  SingleValue,
+} from 'react-select/dist/declarations/src';
 import { Option } from 'renderer/classes/forms/Option';
 import { useMap } from 'usehooks-ts';
-import { faker } from '@faker-js/faker';
-import { insertGenericos, insertValores } from 'renderer/classes/db/queries';
 
-const Form = ({ data }: { data: TypeForm }) => {
+const Form = ({
+  data,
+  refreshFN,
+}: {
+  data: TypeForm;
+  refreshFN: () => void;
+}) => {
   const [inputs, setInputs] = useState<JSX.Element[]>();
 
-  const [map, actions] = useMap<string, string>();
+  const [selectSelectedMap, selectSelectedActions] = useMap<
+    string,
+    string | string[]
+  >();
+
+  const refs = useRef(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Array.from({ length: data.inputs.length }, (_) => createRef<any>())
+  );
 
   function generateInputs(array: Input[], rand: number) {
-    return array?.map((input) => {
+    return array?.map((input, indexInput: number) => {
       let generatedInput = (
         <input
           id={`input-${input.name}`}
@@ -35,18 +52,22 @@ const Form = ({ data }: { data: TypeForm }) => {
 
       if (input.type === 'select') {
         const onChange = (
-          value: SingleValue<Option>,
+          value: MultiValue<Option> | SingleValue<Option>,
           action: ActionMeta<Option>
         ) => {
           if (
             (action.action === 'create-option' ||
               action.action === 'select-option') &&
-            value?.value
+            ((Array.isArray(value) && value?.length > 0) || value?.value)
           ) {
-            actions.set(input.name, value.value);
+            selectSelectedActions.set(
+              input.name,
+              Array.isArray(value) ? value.map((v) => v.value) : value?.value
+            );
           }
 
-          if (action.action === 'clear') actions.remove(input.name);
+          if (action.action === 'clear')
+            selectSelectedActions.remove(input.name);
         };
 
         if (input.select?.type === 'async') {
@@ -58,12 +79,13 @@ const Form = ({ data }: { data: TypeForm }) => {
               options={input.select.options}
               loadOptions={input.select.loadFn}
               value={input.select.options?.find(
-                (o) => o.value === map.get(input.name)
+                (o) => o.value === selectSelectedMap.get(input.name)
               )}
               onChange={onChange}
               defaultOptions
               cacheOptions
               isClearable
+              ref={refs.current[indexInput]}
             />
           );
         } else {
@@ -72,9 +94,9 @@ const Form = ({ data }: { data: TypeForm }) => {
             : null;
 
           if (value) {
-            actions.set(input.name, value);
+            selectSelectedActions.set(input.name, value);
           } else {
-            actions.remove(input.name);
+            selectSelectedActions.remove(input.name);
           }
 
           generatedInput = (
@@ -83,12 +105,14 @@ const Form = ({ data }: { data: TypeForm }) => {
               key={`input-${input.name}-${rand}`}
               defaultValue={
                 input.select?.defaultValue
-                  ? input.select?.options?.find((_, index) => index === 1)
+                  ? input.select?.options?.find((_, index) => index === 0)
                   : undefined
               }
               name={input.name}
               options={input.select?.options}
               onChange={onChange}
+              isMulti={input.select?.multi}
+              ref={refs.current[indexInput]}
             />
           );
         }
@@ -117,25 +141,33 @@ const Form = ({ data }: { data: TypeForm }) => {
   }
 
   useEffect(() => {
-    actions.reset();
+    selectSelectedActions.reset();
     refresh(faker.datatype.number(10000));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   useEffect(() => {
-    actions.reset();
+    selectSelectedActions.reset();
     refresh(faker.datatype.number(10000));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function defaultFormat(input: Input, value: string) {
+  function defaultFormat(input: Input, value: string | string[]) {
     let anyValue: unknown = value;
+
+    if (Array.isArray(value) && value.length === 1) {
+      [anyValue] = value;
+    }
+
     if (input.type === 'number') {
       if (value === '') anyValue = 0;
       anyValue = Number(anyValue);
     }
+
     return { [input.name]: anyValue };
   }
 
-  const getValores = () => {
+  const getValores = (): any[] => {
     const arr: any[] = [];
 
     document.querySelectorAll('[id^="input"]').forEach((input) => {
@@ -144,10 +176,10 @@ const Form = ({ data }: { data: TypeForm }) => {
         (i) => i.name === input.id.replace('input-', '')
       )!;
 
-      let value: string;
+      let value: string | string[];
 
       if (inp.type === 'select') {
-        value = map.get(inp.name) ?? '';
+        value = selectSelectedMap.get(inp.name) ?? '';
       } else if (input instanceof HTMLElement) {
         value = (input as HTMLInputElement).value;
       } else {
@@ -156,14 +188,76 @@ const Form = ({ data }: { data: TypeForm }) => {
 
       arr.push(inp.formatFn ? inp.formatFn(value) : defaultFormat(inp, value));
     });
-    return Object.assign({}, ...arr);
+
+    const finalArr = [];
+    const obj = Object.assign({}, ...arr);
+    const keys = Object.keys(obj).filter((key) => Array.isArray(obj[key]));
+
+    if (keys?.length > 0) {
+      const repeat = keys
+        .map((key) => obj[key]?.length)
+        .reduce((a, b) => a + b);
+
+      for (let i = 0; i < repeat; i += 1) {
+        finalArr.push({ ...obj });
+      }
+
+      const countMap = new Map<string, number>();
+
+      keys.forEach((key) => countMap.set(key, 0));
+
+      return finalArr.map((item) => {
+        keys.forEach((key) => {
+          const count = countMap.get(key) ?? 0;
+          item[key] = obj[key][count];
+          countMap.set(key, count + 1);
+        });
+        return item;
+      });
+    }
+
+    finalArr.push(obj);
+    return finalArr;
+  };
+
+  const clearInputs = () => {
+    data.inputs.forEach((input, index) => {
+      if (input.clearAfterInsert) {
+        const element = document.getElementById(
+          `input-${input.name}`
+        ) as HTMLInputElement;
+
+        if (input.type === 'select') {
+          refs.current[index].current.clearValue();
+        } else if (!Array.isArray(input.value)) {
+          element.value = String(input.value ?? '');
+        } else {
+          element.value = '';
+        }
+      }
+    });
   };
 
   const inserir = () => {
-    const valor = getValores();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const valor: any[] = getValores();
 
     window.electron.ipcRenderer
-      .dbInsertOne(valor?.dia ? insertGenericos : insertValores, valor)
+      .dbInsertMany(data.insert, ...valor)
+      .then((results) => {
+        clearInputs();
+        refreshFN();
+
+        const changedRows = results
+          .map((run) => run.changes)
+          .reduce((a, b) => a + b);
+
+        if (changedRows > 1)
+          console.log(`${changedRows} registros foram incluídos.`);
+        else console.log(`${changedRows} registro foi incluído.`);
+
+        return data;
+      })
       .catch((err) => console.error(err));
   };
 

@@ -1,8 +1,9 @@
-import { queryTagSelect } from '../db/queries';
+import { insertGenericos, queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
 
 const generico: Form = {
+  insert: insertGenericos,
   inputs: [
     {
       name: 'id',
@@ -11,6 +12,7 @@ const generico: Form = {
       readOnly: true,
       disabled: true,
       width: '50px',
+      hidden: true,
     },
     {
       name: 'data',
@@ -20,11 +22,11 @@ const generico: Form = {
       value: `${new Date().getFullYear()}-${
         new Date().getMonth() + 1
       }-${new Date().getDate()}`,
-      formatFn: (value: string) => {
+      formatFn: (value: string | string[]) => {
         return {
-          ano: Number(value.substring(0, 4)),
-          mes: Number(value.substring(5, 7)),
-          dia: Number(value.substring(8)),
+          ano: Number(String(value).substring(0, 4)),
+          mes: Number(String(value).substring(5, 7)),
+          dia: Number(String(value).substring(8)),
         };
       },
     },
@@ -44,17 +46,25 @@ const generico: Form = {
             }),
       },
       width: '250px',
+      clearAfterInsert: true,
     },
-    { name: 'descricao', label: 'Descrição', type: 'text', width: '400px' },
+    {
+      name: 'descricao',
+      label: 'Descrição',
+      type: 'text',
+      width: '400px',
+      clearAfterInsert: true,
+    },
     {
       name: 'valor',
       label: 'Valor',
       type: 'number',
       min: 0,
       step: '0.01',
-      formatFn: (value: string) => {
+      formatFn: (value: string | string[]) => {
         return { valor: Math.abs(Number(value)) * -1 };
       },
+      clearAfterInsert: true,
     },
     {
       name: 'tipo',

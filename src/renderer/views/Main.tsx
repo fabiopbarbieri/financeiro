@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import salario from 'renderer/classes/forms/formSalario';
+import salario from 'renderer/classes/forms/formSalarioTeste';
 import '../styles/Main.css';
 
 import { faker } from '@faker-js/faker';
@@ -41,17 +41,17 @@ const Main = () => {
       .catch((err) => console.error(err));
   }
 
-  const getSalarios = () => {
+  function getSalarios() {
     getValores(Tipo.SALARIO, Salario, setSalarios);
-  };
+  }
 
-  const getDespesas = () => {
+  function getDespesas() {
     getValores(Tipo.DESPESA_FIXA, DespesaFixa, setDespesas);
-  };
+  }
 
-  const getGenericos = () => {
+  function getGenericos() {
     getValores(Tipo.GENERICO, GastoGenerico, setGenericos);
-  };
+  }
 
   const geraGenerico = (): Salario | DespesaFixa | GastoGenerico => {
     const data = faker.date.between(
@@ -137,6 +137,12 @@ const Main = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo]);
 
+  const refresh = () => {
+    if (tipo === Tipo.DESPESA_FIXA) getDespesas();
+    if (tipo === Tipo.GENERICO) getGenericos();
+    if (tipo === Tipo.SALARIO) getSalarios();
+  };
+
   return (
     <div>
       <h1>Financeiro</h1>
@@ -153,19 +159,12 @@ const Main = () => {
         options={tipos}
       />
 
-      <Form data={data} />
+      <Form data={data} refreshFN={refresh} />
       <br />
       <br />
       <br />
       <div className="Hello">
-        <button
-          type="button"
-          onClick={() => {
-            if (tipo === Tipo.DESPESA_FIXA) getDespesas();
-            if (tipo === Tipo.GENERICO) getGenericos();
-            if (tipo === Tipo.SALARIO) getSalarios();
-          }}
-        >
+        <button type="button" onClick={refresh}>
           Obter todos
         </button>
 

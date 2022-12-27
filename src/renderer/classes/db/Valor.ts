@@ -41,7 +41,7 @@ class Valor extends Serializable {
       order: 50,
       property: 'valor',
       format: (value) =>
-        `${Number(value) < 0 ? '-' : ''}\t${Math.abs(Number(value)).toFixed(2)}`
+        `${Number(value).toFixed(2)}`
           .replace(',', '«')
           .replace('.', ',')
           .replace('«', '.'),

@@ -1,8 +1,9 @@
 import { insertValores, queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
+import arrayMeses from '../../helpers/arrayMeses';
 
-const despesaFixa: Form = {
+const salario: Form = {
   insert: insertValores,
   inputs: [
     {
@@ -15,16 +16,29 @@ const despesaFixa: Form = {
       hidden: true,
     },
     {
-      name: 'data',
-      label: 'Mês / Ano',
-      type: 'month',
+      name: 'ano',
+      label: 'Ano',
+      type: 'number',
+      width: '60px',
+      value: new Date().getFullYear(),
+    },
+    {
+      name: 'mes',
+      label: 'Mês',
+      type: 'select',
       width: '200px',
-      value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
-      formatFn: (value: string | string[]) => {
+      // value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
+      formatFn: (values: string | string[]) => {
+        if (!Array.isArray(values)) return { mes: Number(values) };
         return {
-          ano: Number(String(value).substring(0, 4)),
-          mes: Number(String(value).substring(5)),
+          mes: values.map((value) => Number(value)),
         };
+      },
+      select: {
+        type: 'sync',
+        options: arrayMeses,
+        // defaultValue: true,
+        multi: true,
       },
     },
     {
@@ -49,7 +63,7 @@ const despesaFixa: Form = {
       name: 'descricao',
       label: 'Descrição',
       type: 'text',
-      width: '800px',
+      width: '400px',
       clearAfterInsert: true,
     },
     {
@@ -58,18 +72,22 @@ const despesaFixa: Form = {
       type: 'number',
       min: 0,
       step: '0.01',
+      width: '100px',
       clearAfterInsert: true,
     },
     {
       name: 'tipo',
       label: 'Tipo',
       type: 'text',
-      value: Tipo.DESPESA_FIXA,
+      value: Tipo.SALARIO,
       hidden: true,
       readOnly: true,
       disabled: true,
+      formatFn: (value: string | string[]) => {
+        return { tipo: Number(value) };
+      },
     },
   ],
 };
 
-export default despesaFixa;
+export default salario;

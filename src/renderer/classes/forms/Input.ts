@@ -37,10 +37,13 @@ type Input = {
     loadFn?:
       | ((value: string, callback: (options: Option[]) => void) => void)
       | ((value: string) => Promise<Option[]>);
+    multi?: boolean;
   };
 
-  formatFn?: (value: string) => unknown;
+  formatFn?: (value: string | string[]) => unknown;
   hidden?: boolean;
+
+  clearAfterInsert?: boolean;
 };
 
 export default Input;
