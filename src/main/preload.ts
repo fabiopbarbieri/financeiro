@@ -4,13 +4,13 @@ export type Channels = 'db-get' | 'db-insert';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    dbGet(query: string, ...params: any[]) {
+    dbGet(query: string, ...params: unknown[]) {
       return ipcRenderer.invoke('db-get', query, ...params);
     },
-    dbInsert(query: string, ...params: any[]) {
+    dbInsertMany(query: string, ...params: unknown[]) {
       return ipcRenderer.invoke('db-insert-many', query, ...params);
     },
-    dbInsertOne(query: string, object: any) {
+    dbInsertOne(query: string, object: unknown) {
       return ipcRenderer.invoke('db-insert-one', query, object);
     },
     sendMessage(channel: Channels, args: unknown[]) {
