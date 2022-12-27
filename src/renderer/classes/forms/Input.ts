@@ -1,4 +1,4 @@
-import { HTMLInputTypeAttribute } from 'react';
+import { HTMLInputTypeAttribute, FocusEvent } from 'react';
 import { Option } from './Option';
 
 type Input = {
@@ -44,6 +44,7 @@ type Input = {
   hidden?: boolean;
 
   clearAfterInsert?: boolean;
+  onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
 };
 
 export default Input;

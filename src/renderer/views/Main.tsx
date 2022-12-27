@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import salario from 'renderer/classes/forms/formSalarioTeste';
+import salario from 'renderer/classes/forms/formSalario';
 import '../styles/Main.css';
 
 import { faker } from '@faker-js/faker';

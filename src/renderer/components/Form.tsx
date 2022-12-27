@@ -3,7 +3,7 @@ import Select from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import TypeForm from 'renderer/classes/forms/Form';
 import Input from 'renderer/classes/forms/Input';
-import '../styles/Main.css';
+import '../styles/Form.css';
 
 import { faker } from '@faker-js/faker';
 import {
@@ -37,6 +37,7 @@ const Form = ({
     return array?.map((input, indexInput: number) => {
       let generatedInput = (
         <input
+          className="form-input"
           id={`input-${input.name}`}
           key={`input-${input.name}-${rand}`}
           name={input.name}
@@ -47,6 +48,9 @@ const Form = ({
           step={input.step}
           min={input.min}
           max={input.max}
+          required={input.required}
+          placeholder={input.placeholder}
+          onBlur={input.onBlur}
         />
       );
 
@@ -73,6 +77,7 @@ const Form = ({
         if (input.select?.type === 'async') {
           generatedInput = (
             <AsyncCreatableSelect
+              // className="form-input"
               id={`input-${input.name}`}
               key={`input-${input.name}-${rand}`}
               name={input.name}
@@ -81,11 +86,13 @@ const Form = ({
               value={input.select.options?.find(
                 (o) => o.value === selectSelectedMap.get(input.name)
               )}
+              placeholder={input.placeholder}
               onChange={onChange}
               defaultOptions
               cacheOptions
               isClearable
               ref={refs.current[indexInput]}
+              required={input.required}
             />
           );
         } else {
@@ -101,6 +108,7 @@ const Form = ({
 
           generatedInput = (
             <Select
+              // className="form-input"
               id={`input-${input.name}`}
               key={`input-${input.name}-${rand}`}
               defaultValue={
@@ -109,6 +117,7 @@ const Form = ({
                   : undefined
               }
               name={input.name}
+              placeholder={input.placeholder}
               options={input.select?.options}
               onChange={onChange}
               isMulti={input.select?.multi}
@@ -124,12 +133,15 @@ const Form = ({
           style={{
             display: input?.hidden ? 'none' : 'flex',
             flexDirection: 'column',
-            maxWidth: '200px',
+            maxWidth: '1000px',
             width: input.width,
             padding: '2px',
           }}
         >
-          <label htmlFor={`input-${input.name}`}>{input.label}</label>
+          <label htmlFor={`input-${input.name}`}>
+            {input.label}
+            {input.required ? ' *' : null}
+          </label>
           {generatedInput}
         </div>
       );

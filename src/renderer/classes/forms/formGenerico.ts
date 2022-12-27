@@ -29,6 +29,9 @@ const generico: Form = {
           dia: Number(String(value).substring(8)),
         };
       },
+      min: '1900-01-01',
+      max: '3000-12-31',
+      required: true,
     },
     {
       name: 'tag',
@@ -45,8 +48,10 @@ const generico: Form = {
               });
             }),
       },
-      width: '250px',
+      width: '225px',
       clearAfterInsert: true,
+      required: true,
+      placeholder: 'Selecione ou crie uma tag',
     },
     {
       name: 'descricao',
@@ -54,17 +59,25 @@ const generico: Form = {
       type: 'text',
       width: '400px',
       clearAfterInsert: true,
+      required: true,
     },
     {
       name: 'valor',
       label: 'Valor',
       type: 'number',
-      min: 0,
+      min: 0.01,
       step: '0.01',
       formatFn: (value: string | string[]) => {
         return { valor: Math.abs(Number(value)) * -1 };
       },
       clearAfterInsert: true,
+      required: true,
+      placeholder: '',
+      onBlur: (event) => {
+        event.target.value = String(
+          Math.abs(Number(event.target.value)).toFixed(2)
+        );
+      },
     },
     {
       name: 'tipo',

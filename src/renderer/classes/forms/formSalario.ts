@@ -1,6 +1,7 @@
 import { insertValores, queryTagSelect } from '../db/queries';
 import Tipo from '../Tipo';
 import Form from './Form';
+import arrayMeses from '../../helpers/arrayMeses';
 
 const salario: Form = {
   insert: insertValores,
@@ -15,17 +16,33 @@ const salario: Form = {
       hidden: true,
     },
     {
-      name: 'data',
-      label: 'Mês / Ano',
-      type: 'month',
+      name: 'ano',
+      label: 'Ano',
+      type: 'number',
+      width: '60px',
+      value: new Date().getFullYear(),
+      min: 1900,
+      max: 3000,
+      required: true,
+    },
+    {
+      name: 'mes',
+      label: 'Mês',
+      type: 'select',
       width: '200px',
-      value: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
-      formatFn: (value: string | string[]) => {
+      formatFn: (values: string | string[]) => {
+        if (!Array.isArray(values)) return { mes: Number(values) };
         return {
-          ano: Number(String(value).substring(0, 4)),
-          mes: Number(String(value).substring(5)),
+          mes: values.map((value) => Number(value)),
         };
       },
+      select: {
+        type: 'sync',
+        options: arrayMeses,
+        multi: true,
+      },
+      required: true,
+      placeholder: 'Selecione os meses',
     },
     {
       name: 'tag',
@@ -42,8 +59,10 @@ const salario: Form = {
               });
             }),
       },
-      width: '250px',
+      width: '225px',
       clearAfterInsert: true,
+      required: true,
+      placeholder: 'Selecione ou crie uma tag',
     },
     {
       name: 'descricao',
@@ -51,14 +70,17 @@ const salario: Form = {
       type: 'text',
       width: '400px',
       clearAfterInsert: true,
+      required: true,
     },
     {
       name: 'valor',
       label: 'Valor',
       type: 'number',
-      min: 0,
+      min: 0.01,
       step: '0.01',
+      width: '100px',
       clearAfterInsert: true,
+      required: true,
     },
     {
       name: 'tipo',
@@ -68,6 +90,9 @@ const salario: Form = {
       hidden: true,
       readOnly: true,
       disabled: true,
+      formatFn: (value: string | string[]) => {
+        return { tipo: Number(value) };
+      },
     },
   ],
 };
