@@ -1,8 +1,8 @@
 import { createRef, useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import TypeForm from 'renderer/classes/forms/Form';
-import Input from 'renderer/classes/forms/Input';
+import TypeForm from 'renderer/classes/genericForm/Form';
+import Input from 'renderer/classes/genericForm/Input';
 import '../styles/Form.css';
 
 import { faker } from '@faker-js/faker';
@@ -11,7 +11,7 @@ import {
   MultiValue,
   SingleValue,
 } from 'react-select/dist/declarations/src';
-import { Option } from 'renderer/classes/forms/Option';
+import { Option } from 'renderer/classes/genericForm/Option';
 import { useMap } from 'usehooks-ts';
 
 const Form = ({

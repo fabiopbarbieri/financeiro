@@ -1,4 +1,4 @@
-import { Option } from '../classes/forms/Option';
+import { Option } from '../classes/genericForm/Option';
 
 const meses: Option[] = [
   { label: 'Janeiro', value: '1' },

@@ -1,10 +1,10 @@
-import DatabaseConstructor, { Database, RunResult } from 'better-sqlite3';
+import BetterSqlite3, { Database, RunResult } from 'better-sqlite3';
 import path from 'path';
 
 import webpackPaths from '../../../.erb/configs/webpack.paths';
 import { index1, index2, index3, valores } from './tables/valores';
 
-const configureDB = (isDebug: boolean): Database => {
+const configureDB = (isDebug: boolean): BetterSqlite3.Database => {
   // Read run-time assets
   if (isDebug) {
     path.join(webpackPaths.appPath, 'sql');
@@ -18,7 +18,7 @@ const configureDB = (isDebug: boolean): Database => {
     : path.join(__dirname, '../db.sqlite');
 
   // Connect to db
-  const db: Database = new DatabaseConstructor(dbFile, {
+  const db: Database = new BetterSqlite3(dbFile, {
     verbose: console.log,
   });
 
@@ -31,9 +31,8 @@ const configureDB = (isDebug: boolean): Database => {
   return db;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dbInsert = (
-  db: Database,
+  db: BetterSqlite3.Database,
   query: string,
   ...params: unknown[]
 ): RunResult[] => {
@@ -48,9 +47,9 @@ const dbInsert = (
 
   return result;
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const dbAll = (
-  db: Database,
+  db: BetterSqlite3.Database,
   query: string,
   ...params: Record<string, unknown>[]
 ): Record<string, unknown>[] => {
