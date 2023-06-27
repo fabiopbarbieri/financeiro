@@ -13,19 +13,20 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Valor from 'renderer/classes/db/Valor';
-import Filter from './Filter';
 import proper from '../helpers/properCase';
+import Filter from './Filter';
 
 import '../styles/GenericTable.css';
 
 interface TableProps<T extends Valor> {
   data: T[];
+  onClick: (data: T) => (e: React.MouseEvent<HTMLTableRowElement>) => void;
 }
 
-function GenericTable<T extends Valor>({ data }: TableProps<T>) {
+function GenericTable<T extends Valor>({ data, onClick }: TableProps<T>) {
   const [columns, setColumns] = useState<ColumnDef<T, any>[]>([]);
   const table: Table<T> = useReactTable<T>({
     data,
@@ -116,7 +117,7 @@ function GenericTable<T extends Valor>({ data }: TableProps<T>) {
         <tbody>
           {table.getRowModel().rows.map((row) => {
             return (
-              <tr key={`row-${row.id}`}>
+              <tr key={`row-${row.id}`} onClick={onClick(row.original)}>
                 {row.getVisibleCells().map((cell) => {
                   return (
                     <td

@@ -11,7 +11,7 @@ declare module '@tanstack/table-core' {
 }
 
 class Valor extends Serializable {
-  protected id: number | undefined;
+  id: number | undefined;
 
   protected _table: TableProperties<Valor>[] = [
     { id: 'id', hidden: true, order: -1, type: 'number' },

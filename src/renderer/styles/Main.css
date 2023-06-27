@@ -2,7 +2,7 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
-/* body { */
+body {
   /* position: relative; */
   /* color: white; */
   /* height: 100vh; */
@@ -12,15 +12,15 @@
     #dd5789 51.77%,
     #7a2c9e 129.35%
   ); */
-  /* font-family: sans-serif; */
+  font-family: 'Roboto', sans-serif;
   /* overflow-y: hidden; */
   /* display: flex; */
   /* justify-content: center; */
   /* align-items: center; */
-/* } */
+}
 
 /* button { */
-  /* background-color: white;
+/* background-color: white;
   padding: 10px 20px;
   border-radius: 10px;
   border: none;
@@ -34,28 +34,28 @@
 /* } */
 
 /* button:hover { */
-  /* transform: scale(1.05); */
-  /* opacity: 1; */
+/* transform: scale(1.05); */
+/* opacity: 1; */
 /* } */
 
 /* li { */
-  /* list-style: none; */
+/* list-style: none; */
 /* } */
 
 /* a { */
-  /* text-decoration: none;
+/* text-decoration: none;
   height: fit-content;
   width: fit-content;
   margin: 10px; */
 /* } */
 
 /* a:hover { */
-  /* opacity: 1;
+/* opacity: 1;
   text-decoration: none; */
 /* } */
 
 /* .Hello { */
-  /* display: flex;
+/* display: flex;
   justify-content: center;
   align-items: center;
   margin: 20px 0; */

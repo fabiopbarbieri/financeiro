@@ -2,6 +2,8 @@ import { createRoot } from 'react-dom/client';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 import Main from './views/Main';
 
+import '@fontsource/roboto';
+
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const container = document.getElementById('root')!;
 const root = createRoot(container);

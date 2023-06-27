@@ -118,20 +118,21 @@ const Main = () => {
   ];
 
   const [tipo, setTipo] = useState<Tipo>(Tipo.GENERICO);
-  const [data, setData] = useState<ClasseForm>(formGenerico);
+  const [formSchema, setFormSchema] = useState<ClasseForm>(formGenerico);
+  const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     if (tipo === Tipo.DESPESA_FIXA) {
       getDespesas();
-      setData(formDespesa);
+      setFormSchema(formDespesa);
     }
     if (tipo === Tipo.SALARIO) {
       getSalarios();
-      setData(formSalario);
+      setFormSchema(formSalario);
     }
     if (tipo === Tipo.GENERICO) {
       getGenericos();
-      setData(formGenerico);
+      setFormSchema(formGenerico);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo]);
@@ -141,6 +142,19 @@ const Main = () => {
     if (tipo === Tipo.GENERICO) getGenericos();
     if (tipo === Tipo.SALARIO) getSalarios();
   };
+
+  const onClickTableRowDespesaFixa =
+    (data: DespesaFixa) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+      console.log('click na linha', data);
+    };
+  const onClickTableRowSalario =
+    (data: Salario) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+      console.log('click na linha', data);
+    };
+  const onClickTableRowGastoGenerico =
+    (data: GastoGenerico) => (e: React.MouseEvent<HTMLTableRowElement>) => {
+      console.log('click na linha', data);
+    };
 
   return (
     <div>
@@ -158,7 +172,7 @@ const Main = () => {
         options={tipos}
       />
 
-      <Form data={data} refreshFN={refresh} />
+      <Form schema={formSchema} refreshFN={refresh} data={formData} />
       <br />
       <br />
       <br />
@@ -173,13 +187,22 @@ const Main = () => {
       </div>
 
       {tipo === Tipo.DESPESA_FIXA ? (
-        <GenericTable<DespesaFixa> data={despesas ?? []} />
+        <GenericTable<DespesaFixa>
+          data={despesas ?? []}
+          onClick={onClickTableRowDespesaFixa}
+        />
       ) : null}
       {tipo === Tipo.GENERICO ? (
-        <GenericTable<GastoGenerico> data={genericos ?? []} />
+        <GenericTable<GastoGenerico>
+          data={genericos ?? []}
+          onClick={onClickTableRowGastoGenerico}
+        />
       ) : null}
       {tipo === Tipo.SALARIO ? (
-        <GenericTable<Salario> data={salarios ?? []} />
+        <GenericTable<Salario>
+          data={salarios ?? []}
+          onClick={onClickTableRowSalario}
+        />
       ) : null}
     </div>
   );

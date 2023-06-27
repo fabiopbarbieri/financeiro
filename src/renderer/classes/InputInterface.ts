@@ -4,6 +4,6 @@ export interface InputElementProps
   extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   id: string;
-  key?: string;
+  chave?: string;
   disabled?: boolean;
 }

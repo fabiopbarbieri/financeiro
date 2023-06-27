@@ -108,6 +108,7 @@
     }
   },
   "dependencies": {
+    "@fontsource/roboto": "^4.5.8",
     "@tanstack/match-sorter-utils": "^8.7.2",
     "@tanstack/react-table": "^8.7.4",
     "electron-debug": "^3.2.0",
@@ -192,8 +193,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Financeiro",
+    "appId": "br.com.fabiobarbieri.Financeiro",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -251,8 +252,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "financeiro",
+      "repo": "financeiro"
     }
   },
   "collective": {

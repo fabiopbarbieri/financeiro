@@ -15,13 +15,16 @@ import { Option } from 'renderer/classes/genericForm/Option';
 import { useMap } from 'usehooks-ts';
 
 const Form = ({
-  data,
+  schema,
   refreshFN,
+  data,
 }: {
-  data: TypeForm;
+  schema: TypeForm;
   refreshFN: () => void;
+  data: any;
 }) => {
   const [inputs, setInputs] = useState<JSX.Element[]>();
+  const [inputData, setInputData] = useState(data);
 
   const [selectSelectedMap, selectSelectedActions] = useMap<
     string,
@@ -30,7 +33,7 @@ const Form = ({
 
   const refs = useRef(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Array.from({ length: data.inputs.length }, (_) => createRef<any>())
+    Array.from({ length: schema.inputs.length }, () => createRef<any>())
   );
 
   function generateInputs(array: Input[], rand: number) {
@@ -44,7 +47,7 @@ const Form = ({
           readOnly={input.readOnly}
           disabled={input.disabled}
           type={input.type}
-          defaultValue={input.value}
+          defaultValue={(data ? data[input.name] : null) ?? input.value}
           step={input.step}
           min={input.min}
           max={input.max}
@@ -149,14 +152,26 @@ const Form = ({
   }
 
   function refresh(rand: number) {
-    setInputs(generateInputs(data?.inputs, rand));
+    setInputs(generateInputs(schema?.inputs, rand));
   }
 
   useEffect(() => {
     selectSelectedActions.reset();
     refresh(faker.datatype.number(10000));
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schema]);
+
+  useEffect(() => {
+    if (data) {
+      setInputData(data);
+    }
   }, [data]);
+
+  useEffect(() => {
+    selectSelectedActions.reset();
+    refresh(faker.datatype.number(10000));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputData]);
 
   useEffect(() => {
     selectSelectedActions.reset();
@@ -184,7 +199,7 @@ const Form = ({
 
     document.querySelectorAll('[id^="input"]').forEach((input) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const inp: Input = data.inputs.find(
+      const inp: Input = schema.inputs.find(
         (i) => i.name === input.id.replace('input-', '')
       )!;
 
@@ -233,7 +248,7 @@ const Form = ({
   };
 
   const clearInputs = () => {
-    data.inputs.forEach((input, index) => {
+    schema.inputs.forEach((input, index) => {
       if (input.clearAfterInsert) {
         const element = document.getElementById(
           `input-${input.name}`
@@ -255,7 +270,7 @@ const Form = ({
     const valor: any[] = getValores();
 
     window.electron.ipcRenderer
-      .dbInsertMany(data.insert, ...valor)
+      .dbInsertMany(schema.insert, ...valor)
       .then((results) => {
         clearInputs();
         refreshFN();
@@ -268,7 +283,7 @@ const Form = ({
           console.log(`${changedRows} registros foram incluídos.`);
         else console.log(`${changedRows} registro foi incluído.`);
 
-        return data;
+        return schema;
       })
       .catch((err) => console.error(err));
   };

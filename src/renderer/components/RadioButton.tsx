@@ -12,14 +12,14 @@ const Wrapper = styled.div`
 const RadioButton = ({
   label,
   disabled = false,
-  key,
+  chave,
   value,
   name,
   onClick,
   defaultChecked,
 }: InputElementProps) => {
   return (
-    <Wrapper key={key}>
+    <Wrapper key={chave}>
       <Radio
         type="radio"
         id={`radio-button-${value}`}

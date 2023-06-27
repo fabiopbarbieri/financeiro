@@ -21,6 +21,7 @@ const RadioButtonGroup = ({ label, options, onClick }: IOptionGroup) => {
           value={id}
           label={_label}
           key={`radio-option-${id}`}
+          chave={`radio-option-${id}`}
           id={`radio-option-${id}`}
           name={name}
           disabled={disabled}
